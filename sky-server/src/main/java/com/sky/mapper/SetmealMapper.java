@@ -34,4 +34,12 @@ public interface SetmealMapper {
      * @return
      */
     Page<SetmealVO> pageQuary(SetmealPageQueryDTO setmealPageQueryDTO);
+
+    /**
+     * 根据id查询
+     * @param id
+     * @return
+     */
+    @Select("select * from setmeal where id = #{id}")
+    Setmeal getById(Long id);
 }
