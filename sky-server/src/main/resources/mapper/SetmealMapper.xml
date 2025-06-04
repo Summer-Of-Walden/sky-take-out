@@ -39,6 +39,13 @@
         where id = #{id}
     </update>
 
+    <delete id="deleteBatch">
+        delete from setmeal where id in
+        <foreach collection="ids" item="id" separator="," open="(" close=")">
+            #{id}
+        </foreach>
+    </delete>
+
     <select id="pageQuary" resultType="com.sky.vo.SetmealVO">
         select s.*, c.name  as categoryName
         from setmeal s
