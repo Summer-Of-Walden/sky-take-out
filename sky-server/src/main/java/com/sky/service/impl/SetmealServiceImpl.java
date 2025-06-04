@@ -35,6 +35,7 @@ public class SetmealServiceImpl implements SetmealService {
 
     /**
      * 新增套餐
+     *
      * @param setmealDTO
      */
     @Override
@@ -53,6 +54,7 @@ public class SetmealServiceImpl implements SetmealService {
 
     /**
      * 套餐分页查询
+     *
      * @param setmealPageQueryDTO
      * @return
      */
@@ -65,6 +67,7 @@ public class SetmealServiceImpl implements SetmealService {
 
     /**
      * 根据id查询套餐
+     *
      * @param id
      * @return
      */
@@ -80,6 +83,7 @@ public class SetmealServiceImpl implements SetmealService {
 
     /**
      * 修改套餐
+     *
      * @param setmealDTO
      */
     @Override
@@ -98,6 +102,7 @@ public class SetmealServiceImpl implements SetmealService {
 
     /**
      * 批量删除套餐
+     *
      * @param ids
      */
     @Override
@@ -111,6 +116,21 @@ public class SetmealServiceImpl implements SetmealService {
         }
         setmealMapper.deleteBatch(ids);
         setmealDishMapper.deleteBySetmealIds(ids);
+    }
+
+    /**
+     * 套餐起售、停售
+     *
+     * @param status
+     * @param id
+     */
+    @Override
+    public void startOrStop(Integer status, Long id) {
+        Setmeal setmeal = Setmeal.builder()
+                .id(id)
+                .status(status)
+                .build();
+        setmealMapper.update(setmeal);
     }
 }
 
