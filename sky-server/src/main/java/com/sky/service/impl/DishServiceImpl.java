@@ -67,6 +67,7 @@ public class DishServiceImpl implements DishService {
 
     /**
      * 菜品分页查询
+     *
      * @param dishPageQueryDTO
      * @return
      */
@@ -79,6 +80,7 @@ public class DishServiceImpl implements DishService {
 
     /**
      * 批量删除菜品
+     *
      * @param ids
      */
     @Override
@@ -86,11 +88,11 @@ public class DishServiceImpl implements DishService {
     public void deleteBatch(List<Long> ids) {
         for (Long id : ids) {
             Dish dish = dishMapper.getById(id);
-            if (dish.getStatus() == StatusConstant.ENABLE){
+            if (dish.getStatus() == StatusConstant.ENABLE) {
                 throw new DeletionNotAllowedException(MessageConstant.DISH_ON_SALE);
             }
             List<Long> setmealIdsByDishIds = setmealDishMapper.getSetmealIdsByDishIds(ids);
-            if (setmealIdsByDishIds != null && !setmealIdsByDishIds.isEmpty()){
+            if (setmealIdsByDishIds != null && !setmealIdsByDishIds.isEmpty()) {
                 throw new DeletionNotAllowedException(MessageConstant.DISH_BE_RELATED_BY_SETMEAL);
             }
         }
@@ -104,6 +106,7 @@ public class DishServiceImpl implements DishService {
 
     /**
      * 根据id查询菜品选项
+     *
      * @param id
      * @return
      */
@@ -113,7 +116,7 @@ public class DishServiceImpl implements DishService {
         List<DishFlavor> flavors = dishFlavorMapper.getByDishId(id);
         DishVO dishVO = new DishVO();
         // 将数据封装到DishVO中
-        BeanUtils.copyProperties(dish,dishVO);
+        BeanUtils.copyProperties(dish, dishVO);
         dishVO.setFlavors(flavors);
         return dishVO;
     }
@@ -128,7 +131,7 @@ public class DishServiceImpl implements DishService {
     @Transactional(rollbackFor = Exception.class)
     public void updateWithFlavor(DishDTO dishDTO) {
         Dish dish = new Dish();
-        BeanUtils.copyProperties(dishDTO,dish);
+        BeanUtils.copyProperties(dishDTO, dish);
         List<DishFlavor> flavors = dishDTO.getFlavors();
         dishMapper.update(dish);
         dishFlavorMapper.deleteByDishId(dish.getId());
@@ -140,11 +143,27 @@ public class DishServiceImpl implements DishService {
 
     /**
      * 根据分类id查询菜品选项
+     *
      * @param categoryId
      * @return
      */
     @Override
     public List<DishVO> getByCategoryId(Long categoryId) {
         return dishMapper.getByCategoryId(categoryId);
+    }
+
+    /**
+     * 起售停售菜品
+     *
+     * @param status
+     * @param id
+     */
+    @Override
+    public void startOrStop(Integer status, Long id) {
+        Dish dish = Dish.builder()
+                .id(id)
+                .status(status)
+                .build();
+        dishMapper.update(dish);
     }
 }
