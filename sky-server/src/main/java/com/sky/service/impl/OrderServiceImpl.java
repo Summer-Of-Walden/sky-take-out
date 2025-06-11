@@ -122,14 +122,15 @@ public class OrderServiceImpl implements OrderService {
         User user = userMapper.getById(userId);
 
         //调用微信支付接口，生成预支付交易单
-        JSONObject jsonObject = weChatPayUtil.pay(
+        /*JSONObject jsonObject = weChatPayUtil.pay(
                 ordersPaymentDTO.getOrderNumber(),
                 new BigDecimal(0.01),
                 "苍穹外卖订单",
                 user.getOpenid()
-        );
+        );*/
 
-        if (jsonObject.getString("code") != null && jsonObject.getString("code").equals("ORDERPAID")) {
+        JSONObject  jsonObject = new JSONObject();
+        if (jsonObject.getString("code") != null && "ORDERPAID".equals(jsonObject.getString("code"))) {
             throw new OrderBusinessException("该订单已支付");
         }
 
@@ -219,7 +220,7 @@ public class OrderServiceImpl implements OrderService {
         orders.setId(id);
         // 如果订单状态为待接单则需要退款
         if (ordersDB.getStatus().equals(Orders.TO_BE_CONFIRMED)) {
-            weChatPayUtil.refund(
+            /*weChatPayUtil.refund(
                     //商户订单号
                     ordersDB.getNumber(),
                     //商户退款单号
@@ -227,7 +228,7 @@ public class OrderServiceImpl implements OrderService {
                     //退款金额，单位 元
                     new BigDecimal("0.01"),
                     //原订单金额
-                    new BigDecimal("0.01"));
+                    new BigDecimal("0.01"));*/
 
             //支付状态修改为 退款
             orders.setPayStatus(Orders.REFUND);
@@ -310,12 +311,13 @@ public class OrderServiceImpl implements OrderService {
         Integer payStatus = ordersDB.getPayStatus();
         if (Objects.equals(payStatus, Orders.PAID)) {
             //用户已支付，需要退款
-            String refund = weChatPayUtil.refund(
+            /* String refund = weChatPayUtil.refund(
                     ordersDB.getNumber(),
                     ordersDB.getNumber(),
                     new BigDecimal("0.01"),
                     new BigDecimal("0.01"));
-            log.info("申请退款：{}", refund);
+            log.info("申请退款：{}", refund);*/
+            log.info("退款成功");
         }
 
         String rejectionReason = ordersRejectionDTO.getRejectionReason();
@@ -337,15 +339,21 @@ public class OrderServiceImpl implements OrderService {
     public void cancel(OrdersCancelDTO ordersCancelDTO) throws Exception {
         Long id = ordersCancelDTO.getId();
         Orders ordersDB = orderMapper.getById(id);
+        if (ordersDB == null || ordersDB.getStatus().equals(Orders.COMPLETED)){
+            throw new OrderBusinessException(MessageConstant.ORDER_STATUS_ERROR);
+        }
         Integer payStatus = ordersDB.getPayStatus();
         if (Objects.equals(payStatus, Orders.PAID)) {
             //用户已支付，需要退款
+            /*
             String refund = weChatPayUtil.refund(
                     ordersDB.getNumber(),
                     ordersDB.getNumber(),
                     new BigDecimal("0.01"),
                     new BigDecimal("0.01"));
             log.info("申请退款：{}", refund);
+            */
+            log.info("退款成功");
         }
         Orders orders = Orders.builder()
                 .id(id)
